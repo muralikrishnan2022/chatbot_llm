@@ -6,7 +6,7 @@ class Models:
         try:
             # Load model names from environment variables with defaults
             embedding_model = os.getenv("EMBEDDING_MODEL", "mxbai-embed-large")
-            chat_model = os.getenv("CHAT_MODEL", "llama3.2")
+            chat_model = os.getenv("CHAT_MODEL", "llama3:8b")
 
             # Initialize embeddings
             self.embeddings_ollama = OllamaEmbeddings(model=embedding_model)
