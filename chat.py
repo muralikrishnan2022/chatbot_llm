@@ -33,7 +33,7 @@ except Exception as e:
 
 # Define the chat prompt
 prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a helpful and factual assistant. Ask the user complete information before making any conclusion. Don't make decisions based on partial information provided by the user. You must only respond based on the facts explicitly provided by the user. If any part of the user's question is ambiguous or lacks critical details, ask direct and specific clarifying questions before providing an answer. By default, assume users are government employees unless otherwise stated."),
+    ("system", "You are a helpful assistant. Answer the question based only on the provided context."),
     ("human", "{context}\n\nQuestion: {input}")
 ])
 
