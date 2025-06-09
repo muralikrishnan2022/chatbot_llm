@@ -33,6 +33,7 @@ except Exception as e:
 
 # Define the chat prompt
 prompt = ChatPromptTemplate.from_messages([
+
     ("system", "You are a helpful assistant. Answer the question based only on the provided context."),
     ("human", "{context}\n\nQuestion: {input}")
 ])
