@@ -14,7 +14,7 @@ class Models:
             # Initialize chat model with a more reasonable temperature
             self.model_ollama = ChatOllama(
                 model=chat_model,
-                temperature=float(os.getenv("MODEL_TEMPERATURE", 0.7))
+                temperature=float(os.getenv("MODEL_TEMPERATURE", 0.3))
             )
         except Exception as e:
             raise RuntimeError(f"Failed to initialize models: {str(e)}")
