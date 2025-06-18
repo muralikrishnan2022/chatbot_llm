@@ -28,18 +28,55 @@ CONFIG = {
     "COLLECTION_NAME": "documents"
 }
 
-def initialize_vector_store(embeddings):
-    """Initialize the Chroma vector store."""
+def initialize_session_vector_store(embeddings, session_id):
+    """Initialize a session-specific Chroma vector store."""
     try:
-        vector_store = Chroma(
+        session_collection_name = f"session_{session_id}_documents"
+        session_vector_store = Chroma(
+            collection_name=session_collection_name,
+            embedding_function=embeddings,
+            persist_directory=None  # In-memory storage
+        )
+        logger.info(f"Successfully initialized session Chroma vector store for session: {session_id}")
+        return session_vector_store
+    except Exception as e:
+        logger.error(f"Error initializing session vector store: {str(e)}")
+        sys.exit(1)
+
+def initialize_vector_stores(embeddings, user_id=None, session_id=None):
+    """Initialize Chroma vector stores for default (book), user-specific (chat history), and session-specific collections."""
+    try:
+        # Initialize default collection (book data)
+        default_persist_directory = os.path.join(CONFIG["PERSIST_DIRECTORY"], "default")
+        os.makedirs(default_persist_directory, exist_ok=True)
+        default_vector_store = Chroma(
             collection_name=CONFIG["COLLECTION_NAME"],
             embedding_function=embeddings,
-            persist_directory=CONFIG["PERSIST_DIRECTORY"]
+            persist_directory=default_persist_directory
         )
-        logger.info("Successfully initialized Chroma vector store")
-        return vector_store
+        logger.info("Successfully initialized default Chroma vector store")
+
+        # Initialize user-specific collection for chat history (if user_id is provided)
+        user_vector_store = None
+        if user_id:
+            user_collection_name = f"user_{user_id}_chat_history"
+            user_persist_directory = os.path.join(CONFIG["PERSIST_DIRECTORY"], f"user_{user_id}")
+            os.makedirs(user_persist_directory, exist_ok=True)
+            user_vector_store = Chroma(
+                collection_name=user_collection_name,
+                embedding_function=embeddings,
+                persist_directory=user_persist_directory
+            )
+            logger.info(f"Successfully initialized user Chroma vector store for user: {user_id}")
+
+        # Initialize session-specific collection (if session_id is provided)
+        session_vector_store = None
+        if session_id:
+            session_vector_store = initialize_session_vector_store(embeddings, session_id)
+
+        return default_vector_store, user_vector_store, session_vector_store
     except Exception as e:
-        logger.error(f"Error initializing vector store: {str(e)}")
+        logger.error(f"Error initializing vector stores: {str(e)}")
         sys.exit(1)
 
 def setup_signal_handlers():
